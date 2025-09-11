@@ -1,14 +1,14 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ApexMind - Digital Learning Platform for Rural Students</title>
     <meta name="description" content="ApexMind brings quality education to rural students with offline-first learning platform. Complete curriculum for classes 1-12 with multi-language support." />
     <meta name="keywords" content="education, rural students, offline learning, digital education, classes 1-12, multi-language, hindi, punjabi, english" />
     <meta name="author" content="ApexMind Educational Platform" />
     <link rel="canonical" href="https://apexmind-education.com" />
-
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://apexmind-education.com" />
@@ -30,10 +30,1589 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  </head>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .gradient-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        .subject-card {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+        .quiz-card {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 101, 101, 0.1) 100%);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+        .teacher-card {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .language-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .language-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div id="app"></div>
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <script>
+        // Application State
+        let appState = {
+            currentPage: 'welcome',
+            currentLanguage: 'english',
+            userType: 'student',
+            studentData: null,
+            selectedClass: null,
+            selectedStream: null,
+            selectedSubstream: null,
+            selectedSubject: null,
+            currentQuiz: null,
+            quizResults: {},
+            selectedStudentId: null
+        };
+
+        // Language Data
+        const translations = {
+            english: {
+                title: "ApexMind",
+                welcome: "Welcome to ApexMind",
+                subtitle: "Digital Learning Platform for Rural Education",
+                description: "ApexMind is designed to provide quality education to students and teachers in rural areas with offline-first technology that works even without internet connection.",
+                features: {
+                    title: "What We Provide:",
+                    list: [
+                        "Complete curriculum for Classes 1-12 with proper stream divisions",
+                        "Interactive quizzes for all subjects with immediate feedback",
+                        "Offline learning capabilities - works without internet",
+                        "Multi-language support (English, Hindi, Punjabi)",
+                        "Progress tracking dashboard for teachers and students"
+                    ]
+                },
+                roadmap: {
+                    title: "How to Use ApexMind:",
+                    steps: [
+                        "Enter your name and select your class to create your profile",
+                        "Choose your preferred language from the available options",
+                        "Select your class (1-12) and appropriate stream if applicable",
+                        "Pick a subject from your curriculum to start learning",
+                        "Take quizzes to test your knowledge and track progress"
+                    ]
+                },
+                studentLogin: "Student Login",
+                teacherLogin: "Teacher Dashboard",
+                name: "Name",
+                class: "Class",
+                login: "Login",
+                selectClass: "Select Your Class",
+                selectStream: "Select Stream",
+                selectSubstream: "Select Sub-stream",
+                subjects: "Subjects",
+                takeQuiz: "Take Quiz",
+                back: "Back",
+                submit: "Submit",
+                score: "Score",
+                progress: "Progress",
+                retakeQuiz: "Retake Quiz",
+                backToSubjects: "Back to Subjects",
+                coreSubjects: "Core Subjects",
+                optionalSubjects: "Optional Subjects",
+                quizResults: "Quiz Results",
+                excellentWork: "Excellent work! Keep it up!",
+                keepPracticing: "Keep practicing to improve your score!",
+                lessonsCompleted: "Lessons Completed",
+                quizScore: "Quiz Score",
+                studentNotFound: "Student not found",
+                teacherDashboard: "Teacher Dashboard"
+            },
+            hindi: {
+                title: "एपेक्समाइंड",
+                welcome: "एपेक्समाइंड में आपका स्वागत है",
+                subtitle: "ग्रामीण शिक्षा के लिए डिजिटल लर्निंग प्लेटफॉर्म",
+                description: "एपेक्समाइंड ऑफलाइन-फर्स्ट तकनीक के साथ ग्रामीण क्षेत्रों में छात्रों और शिक्षकों को गुणवत्तापूर्ण शिक्षा प्रदान करने के लिए डिज़ाइन किया गया है जो बिना इंटरनेट के भी काम करता है।",
+                features: {
+                    title: "हम क्या प्रदान करते हैं:",
+                    list: [
+                        "उचित स्ट्रीम विभाजन के साथ कक्षा 1-12 के लिए पूरा पाठ्यक्रम",
+                        "तत्काल फीडबैक के साथ सभी विषयों के लिए इंटरैक्टिव क्विज़",
+                        "ऑफलाइन लर्निंग क्षमताएं - इंटरनेट के बिना भी काम करता है",
+                        "बहुभाषी समर्थन (अंग्रेजी, हिंदी, पंजाबी)",
+                        "शिक्षकों और छात्रों के लिए प्रगति ट्रैकिंग डैशबोर्ड"
+                    ]
+                },
+                roadmap: {
+                    title: "एपेक्समाइंड का उपयोग कैसे करें:",
+                    steps: [
+                        "अपना प्रोफाइल बनाने के लिए अपना नाम दर्ज करें और अपनी कक्षा चुनें",
+                        "उपलब्ध विकल्पों में से अपनी पसंदीदा भाषा चुनें",
+                        "अपनी कक्षा (1-12) और यदि लागू हो तो उपयुक्त स्ट्रीम चुनें",
+                        "सीखना शुरू करने के लिए अपने पाठ्यक्रम से एक विषय चुनें",
+                        "अपने ज्ञान का परीक्षण करने और प्रगति ट्रैक करने के लिए क्विज़ लें"
+                    ]
+                },
+                studentLogin: "छात्र लॉगिन",
+                teacherLogin: "शिक्षक डैशबोर्ड",
+                name: "नाम",
+                class: "कक्षा",
+                login: "लॉगिन",
+                selectClass: "अपनी कक्षा चुनें",
+                selectStream: "स्ट्रीम चुनें",
+                selectSubstream: "सब-स्ट्रीम चुनें",
+                subjects: "विषय",
+                takeQuiz: "क्विज़ लें",
+                back: "वापस",
+                submit: "जमा करें",
+                score: "स्कोर",
+                progress: "प्रगति",
+                retakeQuiz: "क्विज़ फिर से लें",
+                backToSubjects: "विषयों पर वापस जाएं",
+                coreSubjects: "मुख्य विषय",
+                optionalSubjects: "वैकल्पिक विषय",
+                quizResults: "क्विज़ परिणाम",
+                excellentWork: "उत्कृष्ट काम! इसे बनाए रखें!",
+                keepPracticing: "अपना स्कोर सुधारने के लिए अभ्यास करते रहें!",
+                lessonsCompleted: "पूरे किए गए पाठ",
+                quizScore: "क्विज़ स्कोर",
+                studentNotFound: "छात्र नहीं मिला",
+                teacherDashboard: "शिक्षक डैशबोर्ड"
+            },
+            punjabi: {
+                title: "ਐਪੈਕਸਮਾਇੰਡ",
+                welcome: "ਐਪੈਕਸਮਾਇੰਡ ਵਿੱਚ ਤੁਹਾਡਾ ਸੁਆਗਤ ਹੈ",
+                subtitle: "ਪਿੰਡੀ ਸਿੱਖਿਆ ਲਈ ਡਿਜੀਟਲ ਲਰਨਿੰਗ ਪਲੇਟਫਾਰਮ",
+                description: "ਐਪੈਕਸਮਾਇੰਡ ਨੂੰ ਆਫਲਾਇਨ-ਫਸਟ ਤਕਨਾਲੋਜੀ ਨਾਲ ਪਿੰਡੀ ਖੇਤਰਾਂ ਵਿੱਚ ਵਿਦਿਆਰਥੀਆਂ ਅਤੇ ਅਧਿਆਪਕਾਂ ਨੂੰ ਗੁਣਵੱਤਾ ਸਿੱਖਿਆ ਪ੍ਰਦਾਨ ਕਰਨ ਲਈ ਤਿਆਰ ਕੀਤਾ ਗਿਆ ਹੈ ਜੋ ਇੰਟਰਨੈੱਟ ਤੋਂ ਬਿਨਾਂ ਵੀ ਕੰਮ ਕਰਦਾ ਹੈ।",
+                features: {
+                    title: "ਅਸੀਂ ਕੀ ਪ੍ਰਦਾਨ ਕਰਦੇ ਹਾਂ:",
+                    list: [
+                        "ਉਚਿਤ ਸਟ੍ਰੀਮ ਵਿਭਾਜਨ ਦੇ ਨਾਲ ਕਲਾਸ 1-12 ਲਈ ਪੂਰਾ ਪਾਠਕ੍ਰਮ",
+                        "ਤੁਰੰਤ ਫੀਡਬੈਕ ਦੇ ਨਾਲ ਸਾਰੇ ਵਿਸ਼ਿਆਂ ਲਈ ਇੰਟਰੈਕਟਿਵ ਕੁਇਜ਼",
+                        "ਆਫਲਾਇਨ ਸਿਖਲਾਈ ਸਮਰੱਥਾ - ਇੰਟਰਨੈੱਟ ਤੋਂ ਬਿਨਾਂ ਵੀ ਕੰਮ ਕਰਦਾ ਹੈ",
+                        "ਬਹੁ-ਭਾਸ਼ਾ ਸਹਾਇਤਾ (ਅੰਗਰੇਜ਼ੀ, ਹਿੰਦੀ, ਪੰਜਾਬੀ)",
+                        "ਅਧਿਆਪਕਾਂ ਅਤੇ ਵਿਦਿਆਰਥੀਆਂ ਲਈ ਪ੍ਰਗਤੀ ਟਰੈਕਿੰਗ ਡੈਸ਼ਬੋਰਡ"
+                    ]
+                },
+                roadmap: {
+                    title: "ਐਪੈਕਸਮਾਇੰਡ ਦੀ ਵਰਤੋਂ ਕਿਵੇਂ ਕਰੀਏ:",
+                    steps: [
+                        "ਆਪਣਾ ਪ੍ਰੋਫਾਇਲ ਬਣਾਉਣ ਲਈ ਆਪਣਾ ਨਾਮ ਦਾਖਲ ਕਰੋ ਅਤੇ ਆਪਣੀ ਕਲਾਸ ਚੁਣੋ",
+                        "ਉਪਲਬਧ ਵਿਕਲਪਾਂ ਤੋਂ ਆਪਣੀ ਪਸੰਦੀਦਾ ਭਾਸ਼ਾ ਚੁਣੋ",
+                        "ਆਪਣੀ ਕਲਾਸ (1-12) ਅਤੇ ਜੇ ਲਾਗੂ ਹੋਵੇ ਤਾਂ ਉਚਿਤ ਸਟ੍ਰੀਮ ਚੁਣੋ",
+                        "ਸਿਖਲਾਈ ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਆਪਣੇ ਪਾਠਕ੍ਰਮ ਤੋਂ ਇੱਕ ਵਿਸ਼ਾ ਚੁਣੋ",
+                        "ਆਪਣੇ ਗਿਆਨ ਦੀ ਜਾਂਚ ਕਰਨ ਅਤੇ ਪ੍ਰਗਤੀ ਟਰੈਕ ਕਰਨ ਲਈ ਕੁਇਜ਼ ਲਓ"
+                    ]
+                },
+                studentLogin: "ਵਿਦਿਆਰਥੀ ਲਾਗਇਨ",
+                teacherLogin: "ਅਧਿਆਪਕ ਡੈਸ਼ਬੋਰਡ",
+                name: "ਨਾਮ",
+                class: "ਕਲਾਸ",
+                login: "ਲਾਗਇਨ",
+                selectClass: "ਆਪਣੀ ਕਲਾਸ ਚੁਣੋ",
+                selectStream: "ਸਟ੍ਰੀਮ ਚੁਣੋ",
+                selectSubstream: "ਸਬ-ਸਟ੍ਰੀਮ ਚੁਣੋ",
+                subjects: "ਵਿਸ਼ੇ",
+                takeQuiz: "ਕੁਇਜ਼ ਲਓ",
+                back: "ਵਾਪਸ",
+                submit: "ਜਮਾਂ ਕਰੋ",
+                score: "ਸਕੋਰ",
+                progress: "ਪ੍ਰਗਤੀ",
+                retakeQuiz: "ਕੁਇਜ਼ ਦੁਬਾਰਾ ਲਓ",
+                backToSubjects: "ਵਿਸ਼ਿਆਂ 'ਤੇ ਵਾਪਸ ਜਾਓ",
+                coreSubjects: "ਮੁੱਖ ਵਿਸ਼ੇ",
+                optionalSubjects: "ਵਿਕਲਪਿਕ ਵਿਸ਼ੇ",
+                quizResults: "ਕੁਇਜ਼ ਨਤੀਜੇ",
+                excellentWork: "ਸ਼ਾਨਦਾਰ ਕੰਮ! ਇਸਨੂੰ ਜਾਰੀ ਰੱਖੋ!",
+                keepPracticing: "ਆਪਣਾ ਸਕੋਰ ਸੁਧਾਰਨ ਲਈ ਅਭਿਆਸ ਕਰਦੇ ਰਹੋ!",
+                lessonsCompleted: "ਪੂਰੇ ਕੀਤੇ ਪਾਠ",
+                quizScore: "ਕੁਇਜ਼ ਸਕੋਰ",
+                studentNotFound: "ਵਿਦਿਆਰਥੀ ਨਹੀਂ ਮਿਲਿਆ",
+                teacherDashboard: "ਅਧਿਆਪਕ ਡੈਸ਼ਬੋਰਡ"
+            }
+        };
+
+        // Educational Structure
+        const educationalStructure = {
+            1: { subjects: ["English", "Hindi", "Mathematics", "Environmental Science", "Art"] },
+            2: { subjects: ["English", "Hindi", "Mathematics", "Environmental Science", "Art"] },
+            3: { subjects: ["English", "Hindi", "Mathematics", "Environmental Science", "Art", "Computer"] },
+            4: { subjects: ["English", "Hindi", "Mathematics", "Environmental Science", "Art", "Computer"] },
+            5: { subjects: ["English", "Hindi", "Mathematics", "Science", "Social Science", "Computer"] },
+            6: { subjects: ["English", "Hindi", "Mathematics", "Science", "Social Science", "Computer"] },
+            7: { subjects: ["English", "Hindi", "Mathematics", "Science", "Social Science", "Computer"] },
+            8: { subjects: ["English", "Hindi", "Mathematics", "Science", "Social Science", "Computer"] },
+            9: {
+                streams: {
+                    "Science": ["English", "Physics", "Chemistry", "Mathematics", "General Knowledge", "Geography", "History", "Computer", "Physical Education"],
+                    "Commerce": ["English", "Economics", "Business Studies", "Accountancy", "General Knowledge", "Physical Education"]
+                }
+            },
+            10: {
+                streams: {
+                    "Science": ["English", "Physics", "Chemistry", "Mathematics", "General Knowledge", "Geography", "History", "Computer", "Physical Education"],
+                    "Commerce": ["English", "Economics", "Business Studies", "Accountancy", "General Knowledge", "Physical Education"]
+                }
+            },
+            11: {
+                streams: {
+                    "Science": {
+                        substreams: {
+                            "PCM": ["Physics", "Chemistry", "Mathematics", "English"],
+                            "PCB": ["Physics", "Chemistry", "Biology", "English"],
+                            "PCMB": ["Physics", "Chemistry", "Mathematics", "Biology", "English"]
+                        },
+                        extraSubjects: ["Computer Programming with C", "Physical Education"]
+                    },
+                    "Commerce": ["English", "Economics", "Business Studies", "Accountancy", "General Knowledge", "Physical Education"],
+                    "Humanities": ["English", "History", "Geography", "Economics", "Political Science", "Psychology", "Sociology", "Philosophy", "Physical Education"]
+                }
+            },
+            12: {
+                streams: {
+                    "Science": {
+                        substreams: {
+                            "PCM": ["Physics", "Chemistry", "Mathematics", "English"],
+                            "PCB": ["Physics", "Chemistry", "Biology", "English"],
+                            "PCMB": ["Physics", "Chemistry", "Mathematics", "Biology", "English"]
+                        },
+                        extraSubjects: ["Computer Programming with C", "Physical Education"]
+                    },
+                    "Commerce": ["English", "Economics", "Business Studies", "Accountancy", "General Knowledge", "Physical Education"],
+                    "Humanities": ["English", "History", "Geography", "Economics", "Political Science", "Psychology", "Sociology", "Philosophy", "Physical Education"]
+                }
+            }
+        };
+
+        // Quiz Questions by Subject (Subject-specific questions)
+        const quizQuestions = {
+            "Mathematics": [
+                {
+                    question: "What is 15 + 28?",
+                    options: ["41", "43", "45", "47"],
+                    correct: 1
+                },
+                {
+                    question: "What is the square root of 64?",
+                    options: ["6", "7", "8", "9"],
+                    correct: 2
+                },
+                {
+                    question: "What is 12 × 7?",
+                    options: ["82", "84", "86", "88"],
+                    correct: 1
+                },
+                {
+                    question: "Solve: 2x + 5 = 15",
+                    options: ["x = 3", "x = 5", "x = 7", "x = 10"],
+                    correct: 1
+                },
+                {
+                    question: "What is the area of a circle with radius 3?",
+                    options: ["6π", "9π", "12π", "18π"],
+                    correct: 1
+                }
+            ],
+            "Physics": [
+                {
+                    question: "What is the unit of force?",
+                    options: ["Joule", "Newton", "Watt", "Pascal"],
+                    correct: 1
+                },
+                {
+                    question: "What is the speed of light in vacuum?",
+                    options: ["3×10⁸ m/s", "3×10⁶ m/s", "3×10⁷ m/s", "3×10⁹ m/s"],
+                    correct: 0
+                },
+                {
+                    question: "What is Newton's first law of motion?",
+                    options: ["F = ma", "Law of inertia", "Action-reaction", "Conservation of energy"],
+                    correct: 1
+                },
+                {
+                    question: "What is the acceleration due to gravity?",
+                    options: ["9.8 m/s²", "10.8 m/s²", "8.9 m/s²", "11.2 m/s²"],
+                    correct: 0
+                },
+                {
+                    question: "Which law explains rocket propulsion?",
+                    options: ["First law", "Second law", "Third law", "Law of gravitation"],
+                    correct: 2
+                }
+            ],
+            "Chemistry": [
+                {
+                    question: "What is the chemical symbol for Gold?",
+                    options: ["Go", "Gd", "Au", "Ag"],
+                    correct: 2
+                },
+                {
+                    question: "What is the pH of pure water?",
+                    options: ["6", "7", "8", "9"],
+                    correct: 1
+                },
+                {
+                    question: "How many electrons does a carbon atom have?",
+                    options: ["4", "6", "8", "12"],
+                    correct: 1
+                },
+                {
+                    question: "What is the molecular formula of water?",
+                    options: ["HO", "H2O", "H3O", "OH"],
+                    correct: 1
+                },
+                {
+                    question: "Which gas is most abundant in Earth's atmosphere?",
+                    options: ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+                    correct: 2
+                }
+            ],
+            "Biology": [
+                {
+                    question: "What is the powerhouse of the cell?",
+                    options: ["Nucleus", "Ribosome", "Mitochondria", "Golgi body"],
+                    correct: 2
+                },
+                {
+                    question: "How many chambers does a human heart have?",
+                    options: ["2", "3", "4", "5"],
+                    correct: 2
+                },
+                {
+                    question: "What is photosynthesis?",
+                    options: ["Breathing", "Making food using sunlight", "Cell division", "Growth"],
+                    correct: 1
+                },
+                {
+                    question: "Which blood group is universal donor?",
+                    options: ["A", "B", "AB", "O"],
+                    correct: 3
+                },
+                {
+                    question: "What is DNA?",
+                    options: ["Protein", "Carbohydrate", "Genetic material", "Enzyme"],
+                    correct: 2
+                }
+            ],
+            "English": [
+                {
+                    question: "What is the past tense of 'go'?",
+                    options: ["Goes", "Going", "Went", "Gone"],
+                    correct: 2
+                },
+                {
+                    question: "Which is a noun?",
+                    options: ["Run", "Beautiful", "House", "Quickly"],
+                    correct: 2
+                },
+                {
+                    question: "What is a synonym for 'happy'?",
+                    options: ["Sad", "Joyful", "Angry", "Tired"],
+                    correct: 1
+                },
+                {
+                    question: "Which is the correct spelling?",
+                    options: ["Recieve", "Receive", "Recive", "Receave"],
+                    correct: 1
+                },
+                {
+                    question: "What is an adjective?",
+                    options: ["Action word", "Describing word", "Naming word", "Joining word"],
+                    correct: 1
+                }
+            ],
+            "Hindi": [
+                {
+                    question: "हिंदी की देवनागरी लिपि में कितने स्वर हैं?",
+                    options: ["9", "10", "11", "12"],
+                    correct: 2
+                },
+                {
+                    question: "'पुस्तक' का बहुवचन क्या है?",
+                    options: ["पुस्तकें", "पुस्तकों", "पुस्तकएं", "किताबें"],
+                    correct: 0
+                },
+                {
+                    question: "'सूर्य' का पर्यायवाची शब्द है:",
+                    options: ["चांद", "रवि", "तारा", "ग्रह"],
+                    correct: 1
+                }
+            ],
+            "Economics": [
+                {
+                    question: "What is the basic economic problem?",
+                    options: ["Inflation", "Unemployment", "Scarcity", "Poverty"],
+                    correct: 2
+                },
+                {
+                    question: "GDP stands for:",
+                    options: ["Gross Domestic Product", "General Development Plan", "Global Development Program", "Gross Development Product"],
+                    correct: 0
+                },
+                {
+                    question: "What is demand?",
+                    options: ["Willingness to pay", "Ability to pay", "Willingness and ability to buy", "Need for goods"],
+                    correct: 2
+                }
+            ],
+            "Business Studies": [
+                {
+                    question: "What is management?",
+                    options: ["Planning only", "Organizing only", "Coordinating activities", "Controlling only"],
+                    correct: 2
+                },
+                {
+                    question: "Which is not a function of management?",
+                    options: ["Planning", "Organizing", "Staffing", "Accounting"],
+                    correct: 3
+                },
+                {
+                    question: "What is marketing?",
+                    options: ["Selling products", "Advertising", "Creating customer value", "Making products"],
+                    correct: 2
+                }
+            ],
+            "Accountancy": [
+                {
+                    question: "What is the accounting equation?",
+                    options: ["Assets = Liabilities", "Assets = Capital", "Assets = Liabilities + Capital", "Liabilities = Capital"],
+                    correct: 2
+                },
+                {
+                    question: "Which side shows assets in balance sheet?",
+                    options: ["Left", "Right", "Both", "Neither"],
+                    correct: 0
+                },
+                {
+                    question: "What is debit?",
+                    options: ["Decrease in assets", "Increase in liabilities", "Left side of account", "Right side of account"],
+                    correct: 2
+                }
+            ]
+        };
+
+        // Mock Student Data for Teacher View
+        const mockStudents = [
+            {
+                id: 1,
+                name: "Rajesh Kumar",
+                class: "10",
+                stream: "Science",
+                status: "In Progress",
+                progress: {
+                    "Mathematics": { completed: 8, total: 10, quizScore: 75 },
+                    "Physics": { completed: 6, total: 10, quizScore: 68 },
+                    "Chemistry": { completed: 7, total: 10, quizScore: 82 }
+                }
+            },
+            {
+                id: 2,
+                name: "Priya Singh",
+                class: "12",
+                stream: "Commerce",
+                status: "Completed",
+                progress: {
+                    "Economics": { completed: 10, total: 10, quizScore: 89 },
+                    "Business Studies": { completed: 10, total: 10, quizScore: 94 },
+                    "Accountancy": { completed: 10, total: 10, quizScore: 76 }
+                }
+            },
+            {
+                id: 3,
+                name: "Amit Sharma",
+                class: "11",
+                stream: "Science - PCM",
+                status: "In Progress",
+                progress: {
+                    "Physics": { completed: 9, total: 10, quizScore: 85 },
+                    "Chemistry": { completed: 8, total: 10, quizScore: 79 },
+                    "Mathematics": { completed: 7, total: 10, quizScore: 91 }
+                }
+            },
+            {
+                id: 4,
+                name: "Neha Patel",
+                class: "12",
+                stream: "Science - PCB",
+                status: "In Progress",
+                progress: {
+                    "Physics": { completed: 9, total: 10, quizScore: 78 },
+                    "Chemistry": { completed: 10, total: 10, quizScore: 88 },
+                    "Biology": { completed: 8, total: 10, quizScore: 92 }
+                }
+            },
+            {
+                id: 5,
+                name: "Vikram Singh",
+                class: "9",
+                stream: "Commerce",
+                status: "In Progress",
+                progress: {
+                    "Economics": { completed: 5, total: 10, quizScore: 72 },
+                    "Business Studies": { completed: 6, total: 10, quizScore: 68 },
+                    "English": { completed: 8, total: 10, quizScore: 85 }
+                }
+            }
+        ];
+
+        // Utility Functions
+        function getText(key) {
+            const keys = key.split('.');
+            let value = translations[appState.currentLanguage];
+            for (let k of keys) {
+                if (value && typeof value === 'object') {
+                    value = value[k];
+                } else {
+                    return key;
+                }
+            }
+            return value || key;
+        }
+
+        function saveToStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (e) {
+                console.warn('Failed to save to localStorage:', e);
+            }
+        }
+
+        function getFromStorage(key) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            } catch (e) {
+                console.warn('Failed to load from localStorage:', e);
+                return null;
+            }
+        }
+
+        // Navigation Functions
+        function navigateTo(page, data = {}) {
+            appState.currentPage = page;
+            Object.assign(appState, data);
+            render();
+        }
+
+        function goBack() {
+            switch(appState.currentPage) {
+                case 'studentLogin':
+                    navigateTo('welcome');
+                    break;
+                case 'classList':
+                    navigateTo('welcome');
+                    break;
+                case 'streamSelection':
+                    navigateTo('classList');
+                    break;
+                case 'substreamSelection':
+                    navigateTo('streamSelection');
+                    break;
+                case 'subjectList':
+                    if (appState.selectedSubstream) {
+                        navigateTo('substreamSelection');
+                    } else if (appState.selectedStream) {
+                        navigateTo('streamSelection');
+                    } else {
+                        navigateTo('classList');
+                    }
+                    break;
+                case 'quiz':
+                    navigateTo('subjectList');
+                    break;
+                case 'quizResult':
+                    navigateTo('subjectList');
+                    break;
+                case 'teacherDashboard':
+                    navigateTo('welcome');
+                    break;
+                case 'studentDetail':
+                    navigateTo('teacherDashboard');
+                    break;
+                default:
+                    navigateTo('welcome');
+            }
+        }
+
+        // Component Functions
+        function createLanguageSelector() {
+            const languages = [
+                { code: 'english', name: 'English', flag: '🇬🇧' },
+                { code: 'hindi', name: 'हिंदी', flag: '🇮🇳' },
+                { code: 'punjabi', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳' }
+            ];
+
+            return `
+                <div class="flex flex-wrap gap-2 justify-center">
+                    ${languages.map(lang => `
+                        <button 
+                            onclick="changeLanguage('${lang.code}')"
+                            class="language-btn px-4 py-2 rounded-lg transition-all ${
+                                appState.currentLanguage === lang.code 
+                                    ? 'gradient-bg text-white shadow-lg' 
+                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                            } flex items-center gap-2"
+                        >
+                            <span>${lang.flag}</span>
+                            <span>${lang.name}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function createWelcomePage() {
+            return `
+                <div class="min-h-screen flex flex-col fade-in">
+                    <!-- Header -->
+                    <header class="gradient-bg p-6 text-center">
+                        <h1 class="text-4xl md:text-6xl font-bold mb-2">${getText('title')}</h1>
+                        <p class="text-lg md:text-xl opacity-90">${getText('subtitle')}</p>
+                    </header>
+
+                    <!-- Main Content -->
+                    <main class="flex-1 max-w-6xl mx-auto p-6 w-full">
+                        <!-- Welcome Section -->
+                        <section class="gradient-card rounded-xl p-8 mb-8 card-hover">
+                            <h2 class="text-3xl font-bold mb-4 text-center">${getText('welcome')}</h2>
+                            <p class="text-lg text-gray-300 text-center mb-6 leading-relaxed">${getText('description')}</p>
+                            
+                            <!-- Language Selector -->
+                            <div class="mb-8">
+                                <h3 class="text-xl font-semibold mb-4 text-center">Choose Language / भाषा चुनें / ਭਾਸ਼ਾ ਚੁਣੋ</h3>
+                                ${createLanguageSelector()}
+                            </div>
+                        </section>
+
+                        <!-- Features Section -->
+                        <section class="subject-card rounded-xl p-8 mb-8 card-hover">
+                            <h3 class="text-2xl font-bold mb-6 text-center">${getText('features.title')}</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                ${getText('features.list').map((feature, index) => `
+                                    <div class="flex items-start">
+                                        <span class="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center text-black font-bold text-sm mr-3 mt-1 flex-shrink-0">${index + 1}</span>
+                                        <span class="text-gray-200">${feature}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </section>
+
+                        <!-- Roadmap Section -->
+                        <section class="quiz-card rounded-xl p-8 mb-8 card-hover">
+                            <h3 class="text-2xl font-bold mb-6 text-center">${getText('roadmap.title')}</h3>
+                            <div class="space-y-4">
+                                ${getText('roadmap.steps').map((step, index) => `
+                                    <div class="flex items-start">
+                                        <span class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center mr-4 font-bold flex-shrink-0">
+                                            ${index + 1}
+                                        </span>
+                                        <span class="text-gray-200 pt-2">${step}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </section>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button 
+                                onclick="navigateTo('studentLogin')"
+                                class="gradient-bg px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all card-hover"
+                            >
+                                📚 ${getText('studentLogin')}
+                            </button>
+                            <button 
+                                onclick="navigateTo('teacherDashboard')"
+                                class="teacher-card px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all card-hover"
+                            >
+                                👨‍🏫 ${getText('teacherLogin')}
+                            </button>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function createStudentLoginPage() {
+            return `
+                <div class="min-h-screen flex flex-col fade-in">
+                    <!-- Header -->
+                    <header class="gradient-bg p-6 flex items-center justify-between">
+                        <button onclick="goBack()" class="text-white hover:opacity-80 flex items-center gap-2">
+                            <span>←</span> ${getText('back')}
+                        </button>
+                        <h1 class="text-2xl font-bold">📚 ${getText('studentLogin')}</h1>
+                        <div></div>
+                    </header>
+
+                    <!-- Main Content -->
+                    <main class="flex-1 flex items-center justify-center p-6">
+                        <div class="gradient-card rounded-xl p-8 w-full max-w-md card-hover">
+                            <div class="text-center mb-6">
+                                <div class="text-4xl mb-2">👨‍🎓</div>
+                                <h2 class="text-xl font-bold">${getText('studentLogin')}</h2>
+                            </div>
+                            
+                            <form onsubmit="handleStudentLogin(event)">
+                                <div class="mb-6">
+                                    <label class="block text-lg font-semibold mb-2">${getText('name')}</label>
+                                    <input 
+                                        type="text" 
+                                        id="studentName"
+                                        required
+                                        class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+                                        placeholder="Enter your full name"
+                                    >
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-lg font-semibold mb-2">${getText('class')}</label>
+                                    <select 
+                                        id="studentClass"
+                                        required
+                                        class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+                                    >
+                                        <option value="">Select Your Class</option>
+                                        ${Array.from({length: 12}, (_, i) => i + 1).map(num => 
+                                            `<option value="${num}">Class ${num}</option>`
+                                        ).join('')}
+                                    </select>
+                                </div>
+                                
+                                <button 
+                                    type="submit"
+                                    class="w-full gradient-bg py-3 rounded-lg text-lg font-semibold hover:opacity-90 transition-opacity"
+                                >
+                                    ${getText('login')} 🚀
+                                </button>
+                            </form>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function createClassListPage() {
+            const classes = Array.from({length: 12}, (_, i) => i + 1);
+            
+            return `
+                <div class="min-h-screen flex flex-col fade-in">
+                    <!-- Header -->
+                    <header class="gradient-bg p-6 flex items-center justify-between">
+                        <button onclick="goBack()" class="text-white hover:opacity-80 flex items-center gap-2">
+                            <span>←</span> ${getText('back')}
+                        </button>
+                        <h1 class="text-xl md:text-2xl font-bold">${getText('selectClass')}</h1>
+                        <div class="hidden md:block">
+                            ${createLanguageSelector()}
+                        </div>
+                    </header>
+
+                    <!-- Language selector for mobile -->
+                    <div class="md:hidden p-4 bg-gray-900">
+                        ${createLanguageSelector()}
+                    </div>
+
+                    <!-- Main Content -->
+                    <main class="flex-1 p-6">
+                        <div class="max-w-6xl mx-auto">
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                ${classes.map(classNum => `
+                                    <button 
+                                        onclick="selectClass(${classNum})"
+                                        class="gradient-card p-6 rounded-xl hover:opacity-80 transition-all text-center card-hover"
+                                    >
+                                        <div class="text-4xl font-bold mb-2 text-blue-400">${classNum}</div>
+                                        <div class="text-sm opacity-75">Class ${classNum}</div>
+                                        <div class="text-xs mt-2 opacity-60">Click to enter</div>
+                                    </button>
+                                `).join('')}
+                            </div>
+                            
+                            <!-- Welcome message -->
+                            ${appState.studentData ? `
+                                <div class="mt-8 text-center">
+                                    <p class="text-lg text-gray-300">Welcome back, <span class="text-blue-400 font-semibold">${appState.studentData.name}</span>! 👋</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function createStreamSelectionPage() {
+            const classData = educationalStructure[appState.selectedClass];
+            if (!classData.streams) {
+                navigateTo('subjectList');
+                return '';
+            }
+
+            const streams = Object.keys(classData.streams);
+            const streamEmojis = {
+                "Science": "🧪",
+                "Commerce": "💼",
+                "Humanities": "📚"
+            };
+            
+            return `
+                <div class="min-h-screen flex flex-col fade-in">
+                    <!-- Header -->
+                    <header class="gradient-bg p-6 flex items-center justify-between">
+                        <button onclick="goBack()" class="text-white hover:opacity-80 flex items-center gap-2">
+                            <span>←</span> ${getText('back')}
+                        </button>
+                        <h1 class="text-xl md:text-2xl font-bold">${getText('selectStream')} - Class ${appState.selectedClass}</h1>
+                        <div class="hidden md:block">
+                            ${createLanguageSelector()}
+                        </div>
+                    </header>
+
+                    <!-- Language selector for mobile -->
+                    <div class="md:hidden p-4 bg-gray-900">
+                        ${createLanguageSelector()}
+                    </div>
+
+                    <!-- Main Content -->
+                    <main class="flex-1 p-6">
+                        <div class="max-w-4xl mx-auto">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                ${streams.map(stream => `
+                                    <button 
+                                        onclick="selectStream('${stream}')"
+                                        class="subject-card p-8 rounded-xl hover:opacity-80 transition-all text-center card-hover"
+                                    >
+                                        <div class="text-4xl mb-4">${streamEmojis[stream] || '📖'}</div>
+                                        <div class="text-2xl font-bold mb-2">${stream}</div>
+                                        <div class="text-sm opacity-75">Click to select stream</div>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function createSubstreamSelectionPage() {
+            const classData = educationalStructure[appState.selectedClass];
+            const streamData = classData.streams[appState.selectedStream];
+            
+            if (!streamData.substreams) {
+                navigateTo('subjectList');
+                return '';
+            }
+
+            const substreams = Object.keys(streamData.substreams);
+            
+            return `
+                <div class="min-h-screen flex flex-col fade-in">
+                    <!-- Header -->
+                    <header class="gradient-bg p-6 flex items-center justify-between">
+                        <button onclick="goBack()" class="text-white hover:opacity-80 flex items-center gap-2">
+                            <span>←</span> ${getText('back')}
+                        </button>
+                        <h1 class="text-xl md:text-2xl font-bold">${getText('selectSubstream')} - ${appState.selectedStream}</h1>
+                        <div class="hidden md:block">
+                            ${createLanguageSelector()}
+                        </div>
+                    </header>
+
+                    <!-- Language selector for mobile -->
+                    <div class="md:hidden p-4 bg-gray-900">
+                        ${createLanguageSelector()}
+                    </div>
+
+                    <!-- Main Content -->
+                    <main class="flex-1 p-6">
+                        <div class="max-w-4xl mx-auto">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                ${substreams.map(substream => `
+                                    <button 
+                                        onclick="selectSubstream('${substream}')"
+                                        class="quiz-card p-8 rounded-xl hover:opacity-80 transition-all text-center card-hover"
+                                    >
+                                        <div class="text-3xl font-bold mb-4 text-yellow-400">${substream}</div>
+                                        <div class="text-sm opacity-75 mb-2">
+                                            ${streamData.substreams[substream].join(' • ')}
+                                        </div>
+                                        <div class="text-xs opacity-60">Click to select</div>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function createSubjectListPage() {
+            let subjects = [];
+            let extraSubjects = [];
+
+            const classData = educationalStructure[appState.selectedClass];
+            
+            if (classData.subjects) {
+                subjects = classData.subjects;
+            } else if (classData.streams) {
+                const streamData = classData.streams[appState.selectedStream];
+                
+                if (Array.isArray(streamData)) {
+                    subjects = streamData;
+                } else if (streamData.substreams && appState.selectedSubstream) {
+                    subjects = streamData.substreams[appState.selectedSubstream];
+                    extraSubjects = streamData.extraSubjects || [];
+                } else {
+                    subjects = streamData;
+                }
+            }
+
+            const subjectEmojis = {
+                "Mathematics": "🔢",
+                "Physics": "⚛️",
+                "Chemistry": "🧪",
+                "Biology": "🌱",
+                "English": "📖",
+                "Hindi": "🇮🇳",
+                "Economics": "💰",
+                "Business Studies": "💼",
+                "Accountancy": "📊",
+                "History": "📜",
+                "Geography": "🌍",
+                "Political Science": "🏛️",
+                "Psychology": "🧠",
+                "Sociology": "👥",
+                "Philosophy": "💭",
+                "Computer": "💻",
+                "Physical Education": "🏃‍♂️",
+                "Art": "🎨",
+                "Environmental Science": "🌿",
+                "Science": "🔬",
+                "Social Science": "🏛️",
+                "General Knowledge": "📚",
+                "Computer Programming with C": "👨‍💻"
+            };
+
+            return `
+                <div class="min-h-screen flex flex-col fade-in">
+                    <!-- Header -->
+                    <header class="gradient-bg p-6 flex items-center justify-between">
+                        <button onclick="goBack()" class="text-white hover:opacity-80 flex items-center gap-2">
+                            <span>←</span> ${getText('back')}
+                        </button>
+                        <h1 class="text-xl md:text-2xl font-bold">${getText('subjects')} - Class ${appState.selectedClass}</h1>
+                        <div class="hidden md:block">
+                            ${createLanguageSelector()}
+                        </div>
+                    </header>
+
+                    <!-- Language selector for mobile -->
+                    <div class="md:hidden p-4 bg-gray-900">
+                        ${createLanguageSelector()}
+                    </div>
+
+                    <!-- Main Content -->
+                    <main class="flex-1 p-6">
+                        <div class="max-w-6xl mx-auto">
+                            ${subjects.length > 0 ? `
+                                <div class="mb-8">
+                                    <h2 class="text-2xl font-bold mb-6 text-center">${getText('coreSubjects')} 📚</h2>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        ${subjects.map(subject => `
+                                            <div class="subject-card p-6 rounded-xl card-hover">
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <h3 class="text-lg font-bold">${subject}</h3>
+                                                    <span class="text-2xl">${subjectEmojis[subject] || '📖'}</span>
+                                                </div>
+                                                <div class="space-y-2">
+                                                    <button 
+                                                        onclick="startQuiz('${subject}')"
+                                                        class="w-full gradient-bg px-4 py-2 rounded-lg hover:opacity-90 transition-opacity text-sm"
+                                                    >
+                                                        ${getText('takeQuiz')} 🎯
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${extraSubjects.length > 0 ? `
+                                <div>
+                                    <h2 class="text-2xl font-bold mb-6 text-center">${getText('optionalSubjects')} ⭐</h2>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        ${extraSubjects.map(subject => `
+                                            <div class="quiz-card p-6 rounded-xl card-hover">
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <h3 class="text-lg font-bold">${subject}</h3>
+                                                    <span class="text-2xl">${subjectEmojis[subject] || '📖'}</span>
+                                                </div>
+                                                <button 
+                                                    onclick="startQuiz('${subject}')"
+                                                    class="w-full gradient-bg px-4 py-2 rounded-lg hover:opacity-90 transition-opacity text-sm"
+                                                >
+                                                    ${getText('takeQuiz')} 🎯
+                                                </button>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function createQuizPage() {
+            let questions = quizQuestions[appState.selectedSubject];
+            
+            if (!questions) {
+                questions = [
+                    {
+                        question: `Sample question for ${appState.selectedSubject}: What is the basic concept of this subject?`,
+                        options: ["Option A", "Option B", "Option C", "Option D"],
+                        correct: 0
+                    },
+                    {
+                        question: `Another question for ${appState.selectedSubject}: Which of these is most important?`,
+                        options: ["Knowledge", "Practice", "Understanding", "All of the above"],
+                        correct: 3
+                    },
+                    {
+                        question: `Final question for ${appState.selectedSubject}: What helps in learning?`,
+                        options: ["Reading", "Practice", "Discussion", "All methods"],
+                        correct: 3
+                    }
+                ];
+            }
+
+            if (!appState.currentQuiz) {
+                appState.currentQuiz = {
+                    questions: questions,
+                    currentQuestion: 0,
+                    answers: [],
+                    score: 0
+                };
+            }
+
+            const quiz = appState.currentQuiz;
+            const question = quiz.questions[quiz.currentQuestion];
+
+            return `
+                <div class="min-h-screen flex flex-col fade-in">
+                    <!-- Header -->
+                    <header class="gradient-bg p-6 flex items-center justify-between">
+                        <button onclick="goBack()" class="text-white hover:opacity-80 flex items-center gap-2">
+                            <span>←</span> ${getText('back')}
+                        </button>
+                        <h1 class="text-xl md:text-2xl font-bold">${appState.selectedSubject} Quiz 🎯</h1>
+                        <div class="text-sm bg-white bg-opacity-20 px-3 py-1 rounded-full">
+                            ${quiz.currentQuestion + 1}/${quiz.questions.length}
+                        </div>
+                    </header>
+
+                    <!-- Progress Bar -->
+                    <div class="bg-gray-800 h-2">
+                        <div 
+                            class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 transition-all duration-300" 
+                            style="width: ${((quiz.currentQuestion + 1) / quiz.questions.length) * 100}%"
+                        ></div>
+                    </div>
+
+                    <!-- Main Content -->
+                    <main class="flex-1 p-6">
+                        <div class="max-w-3xl mx-auto">
+                            <div class="gradient-card p-8 rounded-xl card-hover">
+                                <div class="mb-6">
+                                    <div class="text-sm text-gray-400 mb-2">Question ${quiz.currentQuestion + 1} of ${quiz.questions.length}</div>
+                                    <h2 class="text-xl font-bold leading-relaxed">${question.question}</h2>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    ${question.options.map((option, index) => `
+                                        <button 
+                                            onclick="selectAnswer(${index})"
+                                            class="w-full p-4 text-left rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600 hover:border-blue-500 flex items-center"
+                                        >
+                                            <span class="w-8 h-8 bg-gray-600 text-white rounded-full flex items-center justify-center mr-4 font-bold">
+                                                ${String.fromCharCode(65 + index)}
+                                            </span>
+                                            <span>${option}</span>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function createQuizResultPage() {
+            const quiz = appState.currentQuiz;
+            const percentage = Math.round((quiz.score / quiz.questions.length) * 100);
+            const isExcellent = percentage >= 70;
+            
+            return `
+                <div class="min-h-screen flex flex-col fade-in">
+                    <!-- Header -->
+                    <header class="gradient-bg p-6 text-center">
+                        <h1 class="text-2xl font-bold">${getText('quizResults')} 🏆</h1>
+                    </header>
+
+                    <!-- Main Content -->
+                    <main class="flex-1 p-6 flex items-center justify-center">
+                        <div class="gradient-card p-8 rounded-xl text-center max-w-md w-full card-hover">
+                            <div class="text-6xl mb-4">${isExcellent ? '🎉' : '💪'}</div>
+                            <div class="text-6xl font-bold mb-4 ${isExcellent ? 'text-green-400' : 'text-yellow-400'}">${percentage}%</div>
+                            <h2 class="text-2xl font-bold mb-2">${getText('score')}: ${quiz.score}/${quiz.questions.length}</h2>
+                            <p class="text-lg text-gray-300 mb-6">
+                                ${isExcellent ? getText('excellentWork') : getText('keepPracticing')}
+                            </p>
+                            
+                            <!-- Performance breakdown -->
+                            <div class="mb-6 p-4 bg-gray-800 bg-opacity-50 rounded-lg">
+                                <div class="text-sm text-gray-400 mb-2">Performance Breakdown</div>
+                                <div class="w-full bg-gray-700 rounded-full h-3 mb-2">
+                                    <div 
+                                        class="h-3 rounded-full ${isExcellent ? 'bg-green-500' : 'bg-yellow-500'}" 
+                                        style="width: ${percentage}%"
+                                    ></div>
+                                </div>
+                                <div class="text-xs text-gray-400">
+                                    ${quiz.score} correct out of ${quiz.questions.length} questions
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <button 
+                                    onclick="retakeQuiz()"
+                                    class="w-full gradient-bg py-3 rounded-lg hover:opacity-90 transition-opacity"
+                                >
+                                    ${getText('retakeQuiz')} 🔄
+                                </button>
+                                <button 
+                                    onclick="goBack()"
+                                    class="w-full bg-gray-700 py-3 rounded-lg hover:bg-gray-600 transition-colors"
+                                >
+                                    ${getText('backToSubjects')} 📚
+                                </button>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function createTeacherDashboard() {
+            return `
+                <div class="min-h-screen flex flex-col fade-in">
+                    <!-- Header -->
+                    <header class="gradient-bg p-6 flex items-center justify-between">
+                        <button onclick="goBack()" class="text-white hover:opacity-80 flex items-center gap-2">
+                            <span>←</span> ${getText('back')}
+                        </button>
+                        <h1 class="text-xl md:text-2xl font-bold">👨‍🏫 ${getText('teacherDashboard')}</h1>
+                        <div class="hidden md:block">
+                            ${createLanguageSelector()}
+                        </div>
+                    </header>
+
+                    <!-- Language selector for mobile -->
+                    <div class="md:hidden p-4 bg-gray-900">
+                        ${createLanguageSelector()}
+                    </div>
+
+                    <!-- Main Content -->
+                    <main class="flex-1 p-6">
+                        <div class="max-w-6xl mx-auto">
+                            <!-- Dashboard Stats -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <div class="gradient-card p-6 rounded-xl text-center">
+                                    <div class="text-3xl font-bold text-blue-400">${mockStudents.length}</div>
+                                    <div class="text-gray-300">Total Students</div>
+                                </div>
+                                <div class="subject-card p-6 rounded-xl text-center">
+                                    <div class="text-3xl font-bold text-green-400">
+                                        ${mockStudents.filter(s => s.status === 'Completed').length}
+                                    </div>
+                                    <div class="text-gray-300">Completed</div>
+                                </div>
+                                <div class="quiz-card p-6 rounded-xl text-center">
+                                    <div class="text-3xl font-bold text-yellow-400">
+                                        ${mockStudents.filter(s => s.status === 'In Progress').length}
+                                    </div>
+                                    <div class="text-gray-300">In Progress</div>
+                                </div>
+                            </div>
+
+                            <!-- Student List -->
+                            <h2 class="text-2xl font-bold mb-6">Students Overview 📊</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                ${mockStudents.map(student => `
+                                    <div 
+                                        class="teacher-card p-6 rounded-xl cursor-pointer hover:opacity-80 transition-opacity card-hover"
+                                        onclick="viewStudentDetail(${student.id})"
+                                    >
+                                        <div class="flex items-center mb-4">
+                                            <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                                                ${student.name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <h3 class="text-lg font-bold">${student.name}</h3>
+                                                <p class="text-sm text-gray-400">Class ${student.class}</p>
+                                            </div>
+                                        </div>
+                                        <p class="text-gray-300 mb-2"><strong>Stream:</strong> ${student.stream}</p>
+                                        <span class="inline-block px-3 py-1 rounded-full text-sm ${
+                                            student.status === 'Completed' 
+                                                ? 'bg-green-600 text-green-100' 
+                                                : 'bg-yellow-600 text-yellow-100'
+                                        }">
+                                            ${student.status}
+                                        </span>
+                                        <div class="mt-3 text-xs text-gray-400">
+                                            Click to view detailed progress
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function createStudentDetailPage() {
+            const studentId = appState.selectedStudentId;
+            const student = mockStudents.find(s => s.id === studentId);
+            
+            if (!student) {
+                return `
+                    <div class="min-h-screen flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">❌</div>
+                            <div class="text-xl text-gray-300">${getText('studentNotFound')}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="min-h-screen flex flex-col fade-in">
+                    <!-- Header -->
+                    <header class="gradient-bg p-6 flex items-center justify-between">
+                        <button onclick="goBack()" class="text-white hover:opacity-80 flex items-center gap-2">
+                            <span>←</span> ${getText('back')}
+                        </button>
+                        <h1 class="text-xl md:text-2xl font-bold">${student.name} - ${getText('progress')}</h1>
+                        <div class="hidden md:block">
+                            ${createLanguageSelector()}
+                        </div>
+                    </header>
+
+                    <!-- Language selector for mobile -->
+                    <div class="md:hidden p-4 bg-gray-900">
+                        ${createLanguageSelector()}
+                    </div>
+
+                    <!-- Main Content -->
+                    <main class="flex-1 p-6">
+                        <div class="max-w-6xl mx-auto">
+                            <!-- Student Info -->
+                            <div class="gradient-card p-6 rounded-xl mb-6 card-hover">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mr-4">
+                                        ${student.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h2 class="text-2xl font-bold">${student.name}</h2>
+                                        <p class="text-gray-400">Student Profile</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                                        <span class="text-gray-300">Class:</span>
+                                        <span class="font-semibold ml-2 text-blue-400">${student.class}</span>
+                                    </div>
+                                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                                        <span class="text-gray-300">Stream:</span>
+                                        <span class="font-semibold ml-2 text-green-400">${student.stream}</span>
+                                    </div>
+                                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                                        <span class="text-gray-300">Status:</span>
+                                        <span class="font-semibold ml-2 ${student.status === 'Completed' ? 'text-green-400' : 'text-yellow-400'}">${student.status}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Progress Details -->
+                            <h3 class="text-2xl font-bold mb-6">Subject-wise Progress 📈</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                ${Object.entries(student.progress).map(([subject, progress]) => `
+                                    <div class="subject-card p-6 rounded-xl card-hover">
+                                        <h3 class="text-xl font-bold mb-4 flex items-center">
+                                            <span class="mr-2">${subject}</span>
+                                            <span class="text-sm px-2 py-1 rounded-full ${progress.quizScore >= 70 ? 'bg-green-600' : 'bg-yellow-600'} text-white">
+                                                ${progress.quizScore}%
+                                            </span>
+                                        </h3>
+                                        <div class="space-y-4">
+                                            <div>
+                                                <div class="flex justify-between mb-2">
+                                                    <span class="text-gray-300">${getText('lessonsCompleted')}</span>
+                                                    <span class="font-bold">${progress.completed}/${progress.total}</span>
+                                                </div>
+                                                <div class="w-full bg-gray-700 rounded-full h-3">
+                                                    <div 
+                                                        class="bg-blue-500 h-3 rounded-full transition-all duration-500" 
+                                                        style="width: ${(progress.completed / progress.total) * 100}%"
+                                                    ></div>
+                                                </div>
+                                                <div class="text-xs text-gray-400 mt-1">
+                                                    ${Math.round((progress.completed / progress.total) * 100)}% completed
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="flex justify-between mb-2">
+                                                    <span class="text-gray-300">${getText('quizScore')}</span>
+                                                    <span class="font-bold ${progress.quizScore >= 70 ? 'text-green-400' : 'text-yellow-400'}">
+                                                        ${progress.quizScore}%
+                                                    </span>
+                                                </div>
+                                                <div class="w-full bg-gray-700 rounded-full h-3">
+                                                    <div 
+                                                        class="${progress.quizScore >= 70 ? 'bg-green-500' : 'bg-yellow-500'} h-3 rounded-full transition-all duration-500" 
+                                                        style="width: ${progress.quizScore}%"
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        // Event Handlers
+        function changeLanguage(language) {
+            appState.currentLanguage = language;
+            render();
+        }
+
+        function handleStudentLogin(event) {
+            event.preventDefault();
+            const name = document.getElementById('studentName').value.trim();
+            const studentClass = document.getElementById('studentClass').value;
+            
+            if (!name || !studentClass) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            appState.studentData = { name, class: studentClass };
+            saveToStorage('studentData', appState.studentData);
+            
+            // Save login history
+            const loginHistory = getFromStorage('loginHistory') || [];
+            loginHistory.push({
+                name,
+                class: studentClass,
+                timestamp: new Date().toISOString()
+            });
+            saveToStorage('loginHistory', loginHistory);
+            
+            navigateTo('classList');
+        }
+
+        function selectClass(classNum) {
+            appState.selectedClass = classNum;
+            appState.selectedStream = null;
+            appState.selectedSubstream = null;
+            
+            const classData = educationalStructure[classNum];
+            if (classData.streams) {
+                navigateTo('streamSelection');
+            } else {
+                navigateTo('subjectList');
+            }
+        }
+
+        function selectStream(stream) {
+            appState.selectedStream = stream;
+            appState.selectedSubstream = null;
+            
+            const classData = educationalStructure[appState.selectedClass];
+            const streamData = classData.streams[stream];
+            
+            if (streamData.substreams) {
+                navigateTo('substreamSelection');
+            } else {
+                navigateTo('subjectList');
+            }
+        }
+
+        function selectSubstream(substream) {
+            appState.selectedSubstream = substream;
+            navigateTo('subjectList');
+        }
+
+        function startQuiz(subject) {
+            appState.selectedSubject = subject;
+            appState.currentQuiz = null;
+            navigateTo('quiz');
+        }
+
+        function selectAnswer(answerIndex) {
+            const quiz = appState.currentQuiz;
+            const question = quiz.questions[quiz.currentQuestion];
+            
+            quiz.answers[quiz.currentQuestion] = answerIndex;
+            
+            if (answerIndex === question.correct) {
+                quiz.score++;
+            }
+            
+            quiz.currentQuestion++;
+            
+            if (quiz.currentQuestion >= quiz.questions.length) {
+                // Save quiz result
+                const key = `quiz_${appState.selectedSubject}_${appState.studentData ? appState.studentData.name : 'guest'}`;
+                saveToStorage(key, {
+                    subject: appState.selectedSubject,
+                    score: quiz.score,
+                    total: quiz.questions.length,
+                    percentage: Math.round((quiz.score / quiz.questions.length) * 100),
+                    date: new Date().toISOString(),
+                    studentName: appState.studentData ? appState.studentData.name : 'Guest',
+                    studentClass: appState.studentData ? appState.studentData.class : 'Unknown'
+                });
+                
+                navigateTo('quizResult');
+            } else {
+                render();
+            }
+        }
+
+        function retakeQuiz() {
+            appState.currentQuiz = null;
+            navigateTo('quiz');
+        }
+
+        function viewStudentDetail(studentId) {
+            navigateTo('studentDetail', { selectedStudentId: studentId });
+        }
+
+        // Main Render Function
+        function render() {
+            const app = document.getElementById('app');
+            
+            switch(appState.currentPage) {
+                case 'welcome':
+                    app.innerHTML = createWelcomePage();
+                    break;
+                case 'studentLogin':
+                    app.innerHTML = createStudentLoginPage();
+                    break;
+                case 'classList':
+                    app.innerHTML = createClassListPage();
+                    break;
+                case 'streamSelection':
+                    app.innerHTML = createStreamSelectionPage();
+                    break;
+                case 'substreamSelection':
+                    app.innerHTML = createSubstreamSelectionPage();
+                    break;
+                case 'subjectList':
+                    app.innerHTML = createSubjectListPage();
+                    break;
+                case 'quiz':
+                    app.innerHTML = createQuizPage();
+                    break;
+                case 'quizResult':
+                    app.innerHTML = createQuizResultPage();
+                    break;
+                case 'teacherDashboard':
+                    app.innerHTML = createTeacherDashboard();
+                    break;
+                case 'studentDetail':
+                    app.innerHTML = createStudentDetailPage();
+                    break;
+                default:
+                    app.innerHTML = createWelcomePage();
+            }
+
+            // Add smooth scroll behavior
+            document.documentElement.style.scrollBehavior = 'smooth';
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registered successfully:', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('❌ Service Worker registration failed:', registrationError);
+                    });
+            });
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved student data
+            const savedStudentData = getFromStorage('studentData');
+            if (savedStudentData) {
+                appState.studentData = savedStudentData;
+            }
+            
+            // Initial render
+            render();
+            
+            console.log('🚀 ApexMind Application Initialized Successfully!');
+            console.log('📱 Offline-ready educational platform for rural students');
+        });
+
+        // Export functions for debugging (only in development)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            window.apexMindDebug = {
+                appState,
+                navigateTo,
+                changeLanguage,
+                educationalStructure,
+                quizQuestions,
+                mockStudents
+            };
+        }
+    </script>
+</body>
 </html>
